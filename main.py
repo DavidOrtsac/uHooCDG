@@ -3,7 +3,7 @@ from langchain_helper import ArticleGenerator
 from langchain.callbacks import StreamlitCallbackHandler
 
 # Set page config
-st.set_page_config(page_title='Dasho Article Generation', page_icon=':pencil:', layout='centered', initial_sidebar_state='collapsed')
+st.set_page_config(page_title='uHoo Content Draft Generator', page_icon=':potted_plant:', layout='centered', initial_sidebar_state='collapsed')
 
 # Define custom colors for layout
 primaryColor = "#4E89AE"
@@ -54,63 +54,49 @@ custom_css = f"""
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-st.title("Dasho Draft Generator")
+st.title("🪴 uHoo Content Draft Generator | DashoContent")
 st.text("")
 
 expander_info = st.expander('How Does This Work?', expanded=False)
 with expander_info:
-    st.write("### **How the Dasho Draft Generator Works**")
+    st.write("### **How the Content Draft Generator Works**")
     
-    st.write("The Dasho Draft Generator is a powerful tool that harnesses the capabilities of AI to craft written content tailored to your needs. Below is an overview of how the application operates:")
+    st.write("The Content Draft Generator by DashoContent is a powerful tool that harnesses the capabilities of AI to craft written content tailored to your needs. Below is an overview of how the application operates:")
 
-    st.markdown("**1. Model Selection**")
-    st.write("- Choose between two models: GPT-4 and GPT-3.5-Turbo.")
-    st.write("- GPT-4 (Recommended): More intelligent and creative but runs slower.")
-    st.write("- GPT-3.5-Turbo: Faster but less capable than GPT-4.")
-
-    st.markdown("**2. Model Selection**")
-    st.write("- Choose between three token lengths: Short, Medium, and Long.")
+    st.markdown("**1. Content Length Selection**")
+    st.write("- Choose between three content lengths: Short, Medium, and Long.")
     st.write("- Short: Good for captions and short descriptions.")
     st.write("- Medium: Good for call-to-action messages and newsletters.")
     st.write("- Long: Good for longer blog posts and articles, as well as short stories and poems.")
 
-    st.markdown("**3. Input Details**")
-    st.write("- Provide details like your brand, target audience, content type, topic, and writing style.")
+    st.markdown("**2. Input Details**")
+    st.write("- Provide details about your target audience, content type, topic, and writing style.")
     st.write("- The more accurate your inputs, the better the generated content will align with your expectations.")
 
-    st.markdown("**4. Content Generation**")
+    st.markdown("**3. Content Generation**")
     st.write("- Click the 'Generate Draft' button.")
     st.write("- The AI will use your inputs to generate a draft. This process may take a few moments, so your patience is appreciated.")
 
-    st.markdown("**5. Review AI Analysis and First Draft**")
+    st.markdown("**4. Review AI Analysis and First Draft**")
     st.write("- The application will display an AI analysis of your inputs, which gives insights into how the AI perceived your inputs.")
     st.write("- You'll then see the first draft of the content.")
 
-    st.markdown("**6. AI's Second Round of Analysis**")
+    st.markdown("**5. AI's Second Round of Analysis**")
     st.write("- The AI will critically assess the first draft.")
     st.write("- A second, more refined draft is then presented based on this analysis.")
 
-    st.markdown("**7. Feedback and Revisions**")
+    st.markdown("**6. Feedback and Revisions**")
     st.write("- If the content isn't quite right, provide feedback in the designated field.")
     st.write("- Click 'Send Feedback', and the AI will generate a new version of the content considering your comments.")
 
-    st.markdown("**8. Feedback Thread**")
+    st.markdown("**7. Feedback Thread**")
     st.write("- This section displays all previous feedback and the AI's corresponding responses.")
     st.write("- It's a great way to track changes and see the evolution of the content.")
 
-    st.write("With these steps, the Dasho Draft Generator ensures that you receive quality written content, tailored to your specific requirements.")
+    st.write("With these steps, the Content Draft Generator ensures that you receive quality written content, tailored to your specific requirements.")
 
 expander_inputs = st.expander('Inputs', expanded=True)
 with expander_inputs:
-    model_options = ['gpt-4', 'gpt-3.5-turbo']
-    selected_model = st.selectbox('Select Model:', model_options)
-    token_length_options = {
-    'Short': 150,
-    'Medium': 550,
-    'Long': 1022
-    }
-    selected_token_length = st.selectbox('Token Length:', list(token_length_options.keys()))
-    st.markdown("---")
 
     # Initialize state variables
     if 'article_gen' not in st.session_state:
@@ -124,21 +110,25 @@ with expander_inputs:
     if 'show_output' not in st.session_state:
         st.session_state['show_output'] = True
 
-    brand = st.text_input('Brand:', '')
-    brand_description = st.text_input('Brand Description:', '')
     content_type_options = ['', 'Article', 'Blog Post', 'Email Newsletter', 'Newsletter', 'Infographics', 'Short Story', 'Poem', 'Press Release', 'Product Description', 'Product Review', 'Social Media Captions', 'Twitter Captions', 'Advertisement', 'Shortform Video Script', 'SEO-Optimized Article', 'Social Media Post']
     content_type = st.selectbox('Content Type:', sorted(content_type_options))
+    token_length_options = {
+    'Short': 150,
+    'Medium': 550,
+    'Long': 1022
+    }
+    selected_token_length = st.selectbox('Content Length:', list(token_length_options.keys()))
     topic = st.text_input('Topic:', '')
     writing_style = st.text_input('Writing Style:', '')
-    target_audience = st.text_input('Target Audience:', '')
+    target_audience_options = ['', 'Homeowners', 'Renters', 'Parents', 'Asthma, Allergy Patients', 'Architects and Interior Designers (Influencers)']
+    target_audience = st.selectbox('Target Audience:', sorted(target_audience_options))
     additional_instructions = st.text_area('Additional Information (Optional):', '')
 
 
-if brand and brand_description and content_type and topic and writing_style and target_audience and st.button('Generate Draft'):
+if content_type and topic and writing_style and target_audience and st.button('Generate Draft'):
     st.markdown("---")
     if not st.session_state['article_gen']:
-        # Initialize the ArticleGenerator object with the selected token length
-        st.session_state['article_gen'] = ArticleGenerator(selected_model, content_type, brand, brand_description, topic, writing_style, target_audience, additional_instructions, token_length_options[selected_token_length])
+        st.session_state['article_gen'] = ArticleGenerator(content_type, topic, writing_style, target_audience, additional_instructions, token_length_options[selected_token_length])
     container = st.empty()  # Use empty to be able to continually update the output
     st_callback = StreamlitCallbackHandler(container)  # Initialize the Streamlit callback handler
     response = st.session_state['article_gen'].generate(st_callback)  # Pass the callback handler to the generate method

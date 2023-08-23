@@ -16,11 +16,13 @@ openapi_key = os.getenv("OPENAPI_KEY")
 os.environ['OPENAI_API_KEY'] = openapi_key
 
 class ArticleGenerator:
-    def __init__(self, model_name, content_type, brand, brand_description, topic, writing_style, target_audience, additional_instructions, max_tokens=822):
-        self.llm = ChatOpenAI(temperature=0.8, max_tokens=max_tokens, model_name=model_name, streaming=True)
+    def __init__(self, content_type, topic, writing_style, target_audience, additional_instructions, max_tokens=822):
+        self.llm = ChatOpenAI(temperature=0.8, max_tokens=max_tokens, model_name="gpt-4", streaming=True)
         self.content_type = content_type
-        self.brand = brand
-        self.brand_description = brand_description
+        with open("inputs/brand.txt", "r") as file:
+            self.brand = file.read().strip()
+        with open("inputs/brand_description.txt", "r") as file:
+            self.brand_description = file.read().strip()
         self.topic = topic
         self.writing_style = writing_style
         self.target_audience = target_audience
